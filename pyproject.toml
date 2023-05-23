@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["cassiobotaro <cassiobotaro@gmail.com>"]
 readme = "README.md"
-packages = [{include = "o_caminho_do_fastapi"}]
+packages = [{ include = "api_pedidos" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -16,7 +16,17 @@ uvicorn = "^0.22.0"
 [tool.poetry.group.dev.dependencies]
 httpie = "^3.2.2"
 pytest = "^7.3.1"
+isort = "^5.12.0"
+black = "^23.3.0"
+flake8 = "^6.0.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+line_length = 79
+
+[tool.black]
+line-length = 79

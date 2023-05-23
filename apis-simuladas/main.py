@@ -8,7 +8,6 @@ from fastapi import FastAPI, Header, HTTPException, status
 from fastapi.param_functions import Depends
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRouter
-from starlette.responses import PlainTextResponse
 
 DATA_DIR = Path(os.path.dirname(__file__)) / "data"
 FAIL_RATE = int(os.getenv("FAIL_RATE", 0))
@@ -38,7 +37,9 @@ catalogs = APIRouter()
 @app.middleware("http")
 async def controlled_fail_middleware(request, call_next):
     if FAIL_RATE / 100 > random():
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JSONResponse(
+            "", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     return await call_next(request)
 
 
@@ -82,11 +83,15 @@ def orders(_limit: int = 10, _offset: int = 0):
             detail="Offset must be multiple of 10",
         )
     try:
-        return read_data(DATA_DIR / "maestro" / "orders" / f"sample{_offset}.json")
+        return read_data(
+            DATA_DIR / "maestro" / "orders" / f"sample{_offset}.json"
+        )
     except FileNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=read_data(DATA_DIR / "maestro" / "orders" / "not_found.json"),
+            detail=read_data(
+                DATA_DIR / "maestro" / "orders" / "not_found.json"
+            ),
         )
 
 
@@ -97,10 +102,14 @@ def order(order_id: UUID):
     except FileNotFoundError:
         error = read_data(DATA_DIR / "maestro" / "order" / "not_found.json")
         error[0]["details"][0]["value"] = str(order_id)
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=error)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=error
+        )
 
 
-@maestro.get("/maestro/v1/orders/{order_id}/packages/{package_id}", tags=["maestro"])
+@maestro.get(
+    "/maestro/v1/orders/{order_id}/packages/{package_id}", tags=["maestro"]
+)
 def packages(order_id: UUID, package_id: UUID):
     try:
         return read_data(
@@ -109,22 +118,30 @@ def packages(order_id: UUID, package_id: UUID):
     except FileNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=read_data(DATA_DIR / "maestro" / "packages" / "not_found.json"),
+            detail=read_data(
+                DATA_DIR / "maestro" / "packages" / "not_found.json"
+            ),
         )
 
 
 @maestro.get(
-    "/maestro/v1/orders/{order_id}/packages/{package_id}/items", tags=["maestro"]
+    "/maestro/v1/orders/{order_id}/packages/{package_id}/items",
+    tags=["maestro"],
 )
 def package_items(order_id: UUID, package_id: UUID):
     try:
         return read_data(
-            DATA_DIR / "maestro" / "package_items" / f"{order_id}{package_id}.json"
+            DATA_DIR
+            / "maestro"
+            / "package_items"
+            / f"{order_id}{package_id}.json"
         )
     except FileNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=read_data(DATA_DIR / "maestro" / "package_items" / "not_found.json"),
+            detail=read_data(
+                DATA_DIR / "maestro" / "package_items" / "not_found.json"
+            ),
         )
 
 

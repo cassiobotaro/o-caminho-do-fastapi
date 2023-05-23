@@ -1,0 +1,36 @@
+name: main
+
+on: [push, pull_request]
+
+jobs:
+  linter-and-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          cache: "poetry"
+
+      - name: Install dependencies
+        shell: bash
+        run: poetry install
+
+      - name: Run isort
+        shell: bash
+        run: poetry run isort --check .
+
+      - name: Run black
+        shell: bash
+        run: poetry run black --check .
+
+      - name: Run flake8
+        shell: bash
+        run: poetry run flake8 . --exclude=.venv
+
+      - name: Run tests
+        shell: bash
+        run: poetry run pytest .
