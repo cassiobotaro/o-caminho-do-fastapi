@@ -8,13 +8,13 @@ from api_pedidos.excecao import (
     FalhaDeComunicacaoError,
     PedidoNaoEncontradoError,
 )
-from api_pedidos.magalu_api import recuperar_itens_por_pedido
+from api_pedidos.magalu_api_async import recuperar_itens_por_pedido
 
 app = FastAPI()
 
 
 @app.exception_handler(PedidoNaoEncontradoError)
-def tratar_erro_pedido_nao_encontrado(
+async def tratar_erro_pedido_nao_encontrado(
     request: Request, exc: PedidoNaoEncontradoError
 ):
     return JSONResponse(
@@ -24,7 +24,7 @@ def tratar_erro_pedido_nao_encontrado(
 
 
 @app.exception_handler(FalhaDeComunicacaoError)
-def tratar_erro_falha_de_comunicacao(
+async def tratar_erro_falha_de_comunicacao(
     request: Request, exc: FalhaDeComunicacaoError
 ):
     return JSONResponse(
@@ -61,5 +61,7 @@ def healthcheck():
     description="Retorna todos os itens de um determinado pedido",
     response_model=list[Item],
 )
-def listar_itens(itens: list[Item] = Depends(recuperar_itens_por_pedido)):
+async def listar_itens(
+    itens: list[Item] = Depends(recuperar_itens_por_pedido),
+):
     return itens
