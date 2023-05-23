@@ -1,0 +1,2 @@
+class PedidoNaoEncontradoError(Exception):
+    pass
