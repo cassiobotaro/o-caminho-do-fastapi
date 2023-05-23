@@ -1,12 +1,11 @@
 from http import HTTPStatus
-from uuid import UUID
 
 import pytest
-from fastapi.testclient import TestClient
-
 from api_pedidos.api import app, recuperar_itens_por_pedido
+from fastapi.testclient import TestClient
+from uuid import UUID
 from api_pedidos.esquema import Item
-from api_pedidos.excecao import PedidoNaoEncontradoError
+from api_pedidos.excecao import PedidoNaoEncontradoError, FalhaDeComunicacaoError
 
 
 @pytest.fixture
@@ -87,3 +86,10 @@ class TestListarPedidos:
         sobreescreve_recuperar_itens_por_pedido(itens)
         resposta = cliente.get("/orders/7e290683-d67b-4f96-a940-44bef1f69d21/items")
         assert resposta.json() == itens
+
+    def test_quando_fonte_de_pedidos_falha_um_erro_deve_ser_retornado(
+        self, cliente, sobreescreve_recuperar_itens_por_pedido
+    ):
+        sobreescreve_recuperar_itens_por_pedido(FalhaDeComunicacaoError())
+        resposta = cliente.get("/orders/ea78b59b-885d-4e7b-9cd0-d54acadb4933/items")
+        assert resposta.status_code == HTTPStatus.BAD_GATEWAY
