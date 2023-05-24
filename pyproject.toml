@@ -11,6 +11,8 @@ python = "^3.11"
 fastapi = "^0.95.2"
 httpx = "^0.24.1"
 uvicorn = "^0.22.0"
+lasier = "^0.3.0"
+aiocache = "^0.12.1"
 
 
 [tool.poetry.group.dev.dependencies]
